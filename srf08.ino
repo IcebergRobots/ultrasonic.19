@@ -5,9 +5,11 @@
 void setup() {
   Wire.begin();                // join i2c bus (address optional for master)
   Serial.begin(115200);          // start serial communication at 9600bps
-  for(int i=1; i<=15; i++) {
-    changeAddress(112+i,byte(0xE0));
+  for (int i = 1; i <= 15; i++) {
+    changeAddress(112 + i, byte(0xE0));
   }
+  Serial.println("Address: " + String(DEVICE));
+  Serial.println("Range: " + String(setRange(6000)) + "mm");
 }
 
 int reading = 0;
@@ -71,4 +73,14 @@ void changeAddress(byte oldAddress, byte newAddress)
   Wire.write(byte(0x00));
   Wire.write(newAddress);
   Wire.endTransmission();
+}
+
+int setRange(int millimeter) {
+  byte range;
+  range = ceil(1.0 * constrain(millimeter, 43, 11008) / 43) - 1;
+  Wire.beginTransmission(DEVICE);
+  Wire.write(byte(0x02));
+  Wire.write(range);
+  Wire.endTransmission();
+  return (range+1)*43;
 }
