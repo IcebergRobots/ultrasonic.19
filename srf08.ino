@@ -2,6 +2,8 @@
 
 #define DEVICE 112
 
+unsigned long range = 0;
+
 void setup() {
   Wire.begin();                // join i2c bus (address optional for master)
   Serial.begin(115200);          // start serial communication at 9600bps
@@ -9,7 +11,8 @@ void setup() {
     changeAddress(112 + i, byte(0xE0));
   }
   Serial.println("Address: " + String(DEVICE));
-  Serial.println("Range: " + String(setRange(6000)) + "mm");
+  range = setRange(6000);
+  Serial.println("Range: " + String(range) + "mm " + String(range*65/11008) + "ms");
 }
 
 int reading = 0;
@@ -75,7 +78,7 @@ void changeAddress(byte oldAddress, byte newAddress)
   Wire.endTransmission();
 }
 
-int setRange(int millimeter) {
+unsigned long setRange(int millimeter) {
   byte range;
   range = ceil(1.0 * constrain(millimeter, 43, 11008) / 43) - 1;
   Wire.beginTransmission(DEVICE);
